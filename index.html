@@ -298,21 +298,15 @@
                         <div class="flex items-center justify-center gap-2 text-emerald-400 text-sm mb-6">
                             <i class="fas fa-check-circle"></i> Generated Successfully
                         </div>
-                        <div id="mock-visual" class="bg-gradient-to-br from-purple-900/60 to-pink-900/60 border border-purple-500/30 h-64 rounded-2xl flex flex-col items-center justify-center gap-3 mb-6 px-6 text-center">
+                        <div id="mock-visual" class="bg-gradient-to-br from-blue-100 to-sky-100 border border-blue-200 h-64 rounded-2xl flex flex-col items-center justify-center gap-3 mb-6 px-6 text-center">
                             <div class="text-5xl">📱</div>
-                            <div id="poster-headline" class="text-lg font-semibold text-zinc-100"></div>
-                            <div id="poster-subline" class="text-xs text-zinc-300 max-w-md"></div>
-                            <div class="text-xs text-zinc-500">1080 × 1920 • WhatsApp optimised</div>
+                            <div id="poster-headline" class="text-lg font-semibold text-slate-700"></div>
+                            <div id="poster-subline" class="text-xs text-slate-500 max-w-md"></div>
+                            <div class="text-xs text-slate-400">1080 × 1920 • WhatsApp optimised</div>
                         </div>
                         <div class="mb-4">
-                            <div class="text-xs uppercase tracking-widest text-zinc-500 mb-2">Viral Hooks</div>
+                            <div class="text-xs uppercase tracking-widest text-slate-400 mb-2">Viral Hooks</div>
                             <div id="mock-hooks" class="space-y-2 text-sm"></div>
-                        </div>
-                        <div id="mock-caption" class="italic text-zinc-300 bg-zinc-800/60 rounded-2xl p-4 text-sm leading-relaxed"></div>
-                        <div id="mock-visual" class="bg-gradient-to-br from-blue-100 to-sky-100 border border-blue-200 h-64 rounded-2xl flex flex-col items-center justify-center gap-3 mb-6">
-                            <div class="text-5xl">📱</div>
-                            <div class="text-lg font-medium text-slate-700">Poster Preview</div>
-                            <div class="text-xs text-slate-400">1080 × 1920 • WhatsApp optimised</div>
                         </div>
                         <div id="mock-caption" class="italic text-slate-700 bg-slate-100/60 rounded-2xl p-4 text-sm leading-relaxed"></div>
                         <div class="flex gap-3 mt-6">
@@ -844,7 +838,6 @@
 
         function generateAll() {
             showToast('Generating prediction posters, AI captions, and viral hooks…', 'info');
-            showToast('Generating 12 pieces of content across all platforms…', 'info');
             setTimeout(() => openLottoCanvas('/campaigns/new', 'Batch flow opened in LottoCanvas'), 400);
             setTimeout(() => navigate(1), 1200);
         }
