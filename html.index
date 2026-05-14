@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LottoCanvas • Marketing Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .logo-font { font-family: 'Space Grotesk', sans-serif; }
+        .glass { background: rgba(255,255,255,0.1); backdrop-filter: blur(12px); }
+        .lotto-gradient { background: linear-gradient(135deg, #7e22ce, #ec4899); }
+        .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card-hover:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); }
+    </style>
+</head>
+<body class="bg-zinc-950 text-zinc-200 min-h-screen">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-72 bg-zinc-900 border-r border-zinc-800 flex flex-col">
+            <div class="p-6 border-b border-zinc-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 lotto-gradient rounded-2xl flex items-center justify-center text-white font-bold text-2xl">🎰</div>
+                    <div>
+                        <h1 class="logo-font text-3xl font-semibold tracking-tighter text-white">LottoCanvas</h1>
+                        <p class="text-xs text-purple-400 -mt-1">Marketing Hub</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto p-4">
+                <nav class="space-y-1">
+                    <a onclick="navigate(0)" class="nav-item flex items-center gap-3 px-4 py-3 rounded-2xl bg-purple-950 text-white font-medium cursor-pointer">
+                        <i class="fas fa-tachometer-alt w-5"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a onclick="navigate(1)" class="nav-item flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-zinc-800 text-zinc-300 cursor-pointer">
+                        <i class="fas fa-magic w-5"></i>
+                        <span>Viral Generator</span>
+                    </a>
+                    <a onclick="navigate(2)" class="nav-item flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-zinc-800 text-zinc-300 cursor-pointer">
+                        <i class="fas fa-calendar-alt w-5"></i>
+                        <span>Campaigns</span>
+                    </a>
+                    <a onclick="navigate(3)" class="nav-item flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-zinc-800 text-zinc-300 cursor-pointer">
+                        <i class="fas fa-clock w-5"></i>
+                        <span>Scheduler</span>
+                    </a>
+                    <a onclick="navigate(4)" class="nav-item flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-zinc-800 text-zinc-300 cursor-pointer">
+                        <i class="fas fa-chart-bar w-5"></i>
+                        <span>Analytics</span>
+                    </a>
+                    <a onclick="navigate(5)" class="nav-item flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-zinc-800 text-zinc-300 cursor-pointer">
+                        <i class="fas fa-users w-5"></i>
+                        <span>Referrals</span>
+                    </a>
+                </nav>
+
+                <div class="mt-10 px-4">
+                    <div class="text-xs uppercase tracking-widest text-zinc-500 mb-3">Connected Lotteries</div>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3 bg-zinc-800 rounded-2xl p-3">
+                            <div class="text-2xl">🇿🇦</div>
+                            <div>
+                                <div class="font-medium">UK 49s</div>
+                                <div class="text-xs text-emerald-400">Next draw in 4h</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-zinc-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 bg-purple-600 rounded-full flex items-center justify-center text-xl">👑</div>
+                    <div class="flex-1">
+                        <div class="font-medium">Goodness</div>
+                        <div class="text-xs text-zinc-500">Johannesburg, ZA</div>
+                    </div>
+                    <button onclick="logout()" class="text-zinc-400 hover:text-white">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <!-- Top Bar -->
+            <div class="bg-zinc-900 border-b border-zinc-800 px-8 py-5 flex items-center justify-between sticky top-0 z-50">
+                <div class="flex items-center gap-6">
+                    <h2 id="page-title" class="text-3xl font-semibold logo-font tracking-tight">Marketing Dashboard</h2>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center bg-zinc-800 rounded-3xl px-4 py-2 text-sm">
+                        <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse mr-2"></div>
+                        Connected to LottoCanvas
+                    </div>
+                    
+                    <button onclick="generateAll()" 
+                            class="flex items-center gap-2 bg-white text-zinc-900 px-6 py-3 rounded-3xl font-semibold hover:bg-purple-100 transition-colors">
+                        <i class="fas fa-bolt"></i>
+                        <span>Generate Viral Batch</span>
+                    </button>
+                    
+                    <div class="w-9 h-9 bg-zinc-800 rounded-2xl flex items-center justify-center cursor-pointer hover:bg-zinc-700">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard (Index 0) -->
+            <div id="screen-0" class="p-8">
+                <div class="grid grid-cols-12 gap-6">
+                    <!-- Stats -->
+                    <div class="col-span-12 md:col-span-8 grid grid-cols-2 md:grid-cols-4 gap-6">
+                        <div class="bg-zinc-900 rounded-3xl p-6 card-hover border border-purple-500/20">
+                            <div class="text-purple-400 text-sm">Posts This Week</div>
+                            <div class="text-5xl font-bold mt-2">47</div>
+                            <div class="text-emerald-400 text-sm mt-4 flex items-center gap-1">
+                                <i class="fas fa-arrow-up"></i> +12 from last week
+                            </div>
+                        </div>
+                        <div class="bg-zinc-900 rounded-3xl p-6 card-hover">
+                            <div class="text-amber-400 text-sm">Avg. Engagement</div>
+                            <div class="text-5xl font-bold mt-2">8.4k</div>
+                            <div class="text-sm mt-4">Likes + Comments</div>
+                        </div>
+                        <div class="bg-zinc-900 rounded-3xl p-6 card-hover">
+                            <div class="text-rose-400 text-sm">Reach</div>
+                            <div class="text-5xl font-bold mt-2">124k</div>
+                            <div class="text-sm mt-4">Impressions</div>
+                        </div>
+                        <div class="bg-zinc-900 rounded-3xl p-6 card-hover">
+                            <div class="text-sky-400 text-sm">Conversions</div>
+                            <div class="text-5xl font-bold mt-2">219</div>
+                            <div class="text-xs text-emerald-400 mt-4">App downloads from posts</div>
+                        </div>
+                    </div>
+
+                    <div class="col-span-12 md:col-span-4 bg-zinc-900 rounded-3xl p-6">
+                        <h3 class="font-semibold mb-4">Latest Prediction</h3>
+                        <div class="bg-black/60 rounded-2xl p-5 text-center">
+                            <div class="text-xs text-zinc-400 mb-2">UK 49s • Today</div>
+                            <div class="flex justify-center gap-3 text-4xl font-mono font-bold">
+                                <span class="bg-purple-900/50 px-4 py-2 rounded-2xl">12</span>
+                                <span class="bg-purple-900/50 px-4 py-2 rounded-2xl">19</span>
+                                <span class="bg-purple-900/50 px-4 py-2 rounded-2xl">27</span>
+                                <span class="bg-purple-900/50 px-4 py-2 rounded-2xl">35</span>
+                                <span class="bg-purple-900/50 px-4 py-2 rounded-2xl">41</span>
+                                <span class="bg-rose-900/50 px-4 py-2 rounded-2xl">48</span>
+                            </div>
+                            <button onclick="useThisPrediction()" 
+                                    class="mt-6 w-full py-3 bg-white text-black rounded-2xl font-semibold">Use in Campaign</button>
+                        </div>
+                    </div>
+
+                    <!-- Quick Generator -->
+                    <div class="col-span-12 lg:col-span-8 bg-zinc-900 rounded-3xl p-8">
+                        <h3 class="text-xl font-semibold mb-6 flex items-center gap-3">
+                            <i class="fas fa-wand-magic-sparkles"></i> 
+                            Instant Content Generator
+                        </h3>
+                        
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <div onclick="quickGenerate('whatsapp')" class="bg-zinc-800 hover:bg-purple-900/30 border border-transparent hover:border-purple-500 rounded-3xl p-6 cursor-pointer card-hover">
+                                <div class="text-4xl mb-4">📱</div>
+                                <div class="font-medium">WhatsApp Status</div>
+                                <div class="text-xs text-zinc-400">High-res poster</div>
+                            </div>
+                            <div onclick="quickGenerate('instagram')" class="bg-zinc-800 hover:bg-purple-900/30 border border-transparent hover:border-purple-500 rounded-3xl p-6 cursor-pointer card-hover">
+                                <div class="text-4xl mb-4">📸</div>
+                                <div class="font-medium">Instagram Reel</div>
+                                <div class="text-xs text-zinc-400">15s video template</div>
+                            </div>
+                            <div onclick="quickGenerate('twitter')" class="bg-zinc-800 hover:bg-purple-900/30 border border-transparent hover:border-purple-500 rounded-3xl p-6 cursor-pointer card-hover">
+                                <div class="text-4xl mb-4">𝕏</div>
+                                <div class="font-medium">X Prediction Card</div>
+                                <div class="text-xs text-zinc-400">Engagement optimized</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-span-12 lg:col-span-4 bg-gradient-to-br from-purple-900 to-pink-900 rounded-3xl p-8 flex flex-col justify-between">
+                        <div>
+                            <div class="uppercase text-xs tracking-widest">AI Caption Ready</div>
+                            <div class="text-2xl font-medium mt-2">"These numbers are hitting different today 🔥 My algorithm is screaming 27-41!"</div>
+                        </div>
+                        <button onclick="copyCaption()" 
+                                class="mt-8 bg-white/10 hover:bg-white/20 transition-colors py-4 rounded-3xl text-center font-medium">Copy Caption</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Viral Generator (Index 1) -->
+            <div id="screen-1" class="p-8 hidden">
+                <h2 class="text-3xl font-bold mb-8">Viral Content Generator</h2>
+                
+                <div class="max-w-2xl mx-auto bg-zinc-900 rounded-3xl p-10">
+                    <div class="mb-8">
+                        <label class="block text-sm text-zinc-400 mb-2">Select Prediction Source</label>
+                        <select id="pred-source" class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-6 py-4 text-lg">
+                            <option>Latest UK49s Intelligent Prediction</option>
+                            <option>Hot/Cold Blend (Combi-Matrix)</option>
+                            <option>Gap Analyser Overdue Numbers</option>
+                        </select>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-6 mb-10">
+                        <div>
+                            <label class="block text-sm text-zinc-400 mb-3">Platform</label>
+                            <div class="flex flex-wrap gap-3">
+                                <button onclick="togglePlatform(this)" data-platform="whatsapp" class="platform-btn active px-5 py-3 bg-zinc-800 rounded-2xl">📱 WhatsApp</button>
+                                <button onclick="togglePlatform(this)" data-platform="instagram" class="platform-btn px-5 py-3 bg-zinc-800 rounded-2xl">📸 Instagram</button>
+                                <button onclick="togglePlatform(this)" data-platform="tiktok" class="platform-btn px-5 py-3 bg-zinc-800 rounded-2xl">🎵 TikTok</button>
+                                <button onclick="togglePlatform(this)" data-platform="twitter" class="platform-btn px-5 py-3 bg-zinc-800 rounded-2xl">𝕏 X</button>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm text-zinc-400 mb-3">Style</label>
+                            <select id="style" class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-6 py-4">
+                                <option>Urgent + Hype</option>
+                                <option>Professional Analyst</option>
+                                <option>Fun &amp; Memey</option>
+                                <option>Mysterious Fortune Teller</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button onclick="generateContent()" 
+                            class="w-full py-6 text-xl font-semibold lotto-gradient rounded-3xl hover:scale-105 transition-transform">
+                        ✨ GENERATE BRANDED CONTENT
+                    </button>
+                    
+                    <div id="generated-result" class="hidden mt-10 border border-purple-500/30 rounded-3xl p-8 bg-black/40">
+                        <div class="text-emerald-400 text-center text-sm mb-4">✅ Generated Successfully</div>
+                        <div id="mock-visual" class="bg-zinc-950 border-2 border-dashed border-purple-400 h-80 rounded-2xl flex items-center justify-center text-6xl mb-6">
+                            📱 POSTER PREVIEW
+                        </div>
+                        <div id="mock-caption" class="italic text-zinc-300"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Other screens (placeholders) -->
+            <div id="screen-2" class="p-8 hidden">
+                <h2 class="text-3xl font-bold mb-6">Campaign Manager</h2>
+                <div class="bg-zinc-900 rounded-3xl p-12 text-center">
+                    <p class="text-xl">Campaigns coming soon...</p>
+                    <p class="text-zinc-500 mt-4">Schedule multi-platform blasts with one click</p>
+                </div>
+            </div>
+            <div id="screen-3" class="p-8 hidden">
+                <h2 class="text-3xl font-bold mb-6">Post Scheduler</h2>
+                <div class="bg-zinc-900 rounded-3xl p-12 text-center">
+                    <p class="text-xl">Auto-post queue</p>
+                    <p class="text-zinc-500 mt-4">Connect your Facebook, Instagram, X, Telegram accounts</p>
+                </div>
+            </div>
+            <div id="screen-4" class="p-8 hidden">
+                <h2 class="text-3xl font-bold mb-6">Performance Analytics</h2>
+                <div class="bg-zinc-900 rounded-3xl p-12 text-center">
+                    <p class="text-6xl font-light text-purple-300">124,892</p>
+                    <p class="text-2xl mt-2">Total Reach This Month</p>
+                </div>
+            </div>
+            <div id="screen-5" class="p-8 hidden">
+                <h2 class="text-3xl font-bold mb-6">Referral Program</h2>
+                <div class="max-w-md mx-auto bg-zinc-900 rounded-3xl p-10 text-center">
+                    <div class="text-7xl mb-6">🎁</div>
+                    <h3 class="text-2xl">Invite friends &amp; earn free credits</h3>
+                    <div class="mt-8 bg-zinc-800 rounded-2xl p-6 font-mono text-lg">https://lotto.canvas/ref/goodnessza</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function navigate(index) {
+            document.querySelectorAll('[id^="screen-"]').forEach(s => s.classList.add('hidden'));
+            document.getElementById(`screen-${index}`).classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-item').forEach((el, i) => {
+                if (i === index) {
+                    el.classList.add('bg-purple-950', 'text-white');
+                } else {
+                    el.classList.remove('bg-purple-950', 'text-white');
+                }
+            });
+            
+            const titles = ["Marketing Dashboard", "Viral Content Generator", "Campaign Manager", "Scheduler", "Analytics", "Referrals"];
+            document.getElementById('page-title').textContent = titles[index];
+        }
+        
+        function quickGenerate(type) {
+            alert(`Generating ${type.toUpperCase()} content from latest predictions...`);
+            navigate(1);
+        }
+        
+        function generateContent() {
+            const result = document.getElementById('generated-result');
+            result.classList.remove('hidden');
+            
+            const captions = [
+                "These 6 numbers have been cooking in my LottoCanvas algorithm for 3 days straight 🔥 Who's playing them tonight?",
+                "Hot numbers just dropped. My system says this combination has 87% pattern match. Good luck family!",
+                "The wait is over. My predictions are LIVE. Save this post 👀"
+            ];
+            
+            document.getElementById('mock-caption').innerHTML = captions[Math.floor(Math.random()*captions.length)];
+            
+            setTimeout(() => {
+                alert("✅ Content ready! You can now download or auto-post via Firebase Cloud Functions.");
+            }, 800);
+        }
+        
+        function togglePlatform(btn) {
+            btn.classList.toggle('active');
+            btn.classList.toggle('bg-purple-600');
+        }
+        
+        function useThisPrediction() {
+            alert("Prediction loaded into Viral Generator!");
+            navigate(1);
+        }
+        
+        function copyCaption() {
+            navigator.clipboard.writeText("These numbers are hitting different today 🔥 My algorithm is screaming 27-41!");
+            alert("Caption copied to clipboard!");
+        }
+        
+        function generateAll() {
+            alert("🚀 Generating 12 new pieces of content across all platforms using your latest LottoCanvas predictions...");
+            setTimeout(() => navigate(1), 1200);
+        }
+        
+        function logout() {
+            if (confirm("Sign out of Marketing Hub?")) {
+                window.location.reload();
+            }
+        }
+        
+        // Tailwind script already included
+        window.onload = () => {
+            // Make first nav active
+            document.querySelector('.nav-item').classList.add('bg-purple-950', 'text-white');
+        };
+    </script>
+</body>
+</html>
