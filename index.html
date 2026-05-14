@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LottoCanvas • Marketing Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .logo-font { font-family: 'Space Grotesk', sans-serif; }
+        .glass { background: rgba(255,255,255,0.1); backdrop-filter: blur(12px); }
+        .lotto-gradient { background: linear-gradient(135deg, #7e22ce, #ec4899); }
+        .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card-hover:hover { transform: translateY(-6px); box-shadow: 0 20px 40px -10px rgba(126,34,206,0.25); }
+        .toast { animation: slideIn 0.3s ease, fadeOut 0.4s ease 2.6s forwards; }
+        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; pointer-events: none; } }
+        .modal-overlay { animation: fadeIn 0.2s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .progress-bar { transition: width 1.2s ease; }
+        .badge { font-size: 0.65rem; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 9999px; }
+    </style>
+</head>
+<body class="bg-zinc-950 text-zinc-200 min-h-screen">
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-[9999] flex flex-col gap-3 pointer-events-none"></div>
+
+    <!-- Logout Modal -->
+    <div id="logout-modal" class="hidden fixed inset-0 z-[9998] bg-black/60 flex items-center justify-center modal-overlay">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 max-w-sm w-full mx-4 text-center shadow-2xl">
+            <div class="text-4xl mb-4">👋</div>
+            <h3 class="text-xl font-semibold mb-2">Sign Out</h3>
+            <p class="text-zinc-400 text-sm mb-8">You'll need to sign in again to access your Marketing Hub.</p>
+            <div class="flex gap-3">
+                <button onclick="closeLogoutModal()" class="flex-1 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-2xl font-medium transition-colors">Cancel</button>
+                <button onclick="confirmLogout()" class="flex-1 py-3 bg-rose-600 hover:bg-rose-500 rounded-2xl font-medium transition-colors">Sign Out</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-72 bg-zinc-900 border-r border-zinc-800 flex flex-col">
+            <div class="p-6 border-b border-zinc-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 lotto-gradient rounded-2xl flex items-center justify-center text-white font-bold text-2xl">🎰</div>
+                    <div>
+                        <h1 class="logo-font text-3xl font-semibold tracking-tighter text-white">LottoCanvas</h1>
+                        <p class="text-xs text-purple-400 -mt-1">Marketing Hub</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-4">
+                <nav class="space-y-1">
+                    <a onclick="navigate(0)" class="nav-item flex items-center gap-3 px-4 py-3 rounded-2xl bg-purple-950 text-white font-medium cursor-pointer">
+                        <i class="fas fa-tachometer-alt w-5"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a onclick="navigate(1)" class="nav-item flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-zinc-800 text-zinc-300 cursor-pointer transition-colors">
+                        <i class="fas fa-magic w-5"></i>
+                        <span>Viral Generator</span>
+                    </a>
+                    <a onclick="navigate(2)" class="nav-item flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-zinc-800 text-zinc-300 cursor-pointer transition-colors">
+                        <i class="fas fa-calendar-alt w-5"></i>
+                        <span>Campaigns</span>
+                    </a>
+                    <a onclick="navigate(3)" class="nav-item flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-zinc-800 text-zinc-300 cursor-pointer transition-colors">
+                        <i class="fas fa-clock w-5"></i>
+                        <span>Scheduler</span>
+                    </a>
+                    <a onclick="navigate(4)" class="nav-item flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-zinc-800 text-zinc-300 cursor-pointer transition-colors">
+                        <i class="fas fa-chart-bar w-5"></i>
+                        <span>Analytics</span>
+                    </a>
+                    <a onclick="navigate(5)" class="nav-item flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-zinc-800 text-zinc-300 cursor-pointer transition-colors">
+                        <i class="fas fa-users w-5"></i>
+                        <span>Referrals</span>
+                    </a>
+                </nav>
+
+                <div class="mt-10 px-4">
+                    <div class="text-xs uppercase tracking-widest text-zinc-500 mb-3">Connected Lotteries</div>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3 bg-zinc-800 rounded-2xl p-3">
+                            <div class="text-2xl">🇿🇦</div>
+                            <div>
+                                <div class="font-medium">UK 49s</div>
+                                <div class="text-xs text-emerald-400">Next draw in 4h</div>
+                            </div>
+                            <div class="ml-auto w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-zinc-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 bg-purple-600 rounded-full flex items-center justify-center text-xl">👑</div>
+                    <div class="flex-1">
+                        <div class="font-medium">Goodness</div>
+                        <div class="text-xs text-zinc-500">Johannesburg, ZA</div>
+                    </div>
+                    <button onclick="openLogoutModal()" class="text-zinc-400 hover:text-white transition-colors" title="Sign Out">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <!-- Top Bar -->
+            <div class="bg-zinc-900 border-b border-zinc-800 px-8 py-5 flex items-center justify-between sticky top-0 z-50">
+                <div class="flex items-center gap-6">
+                    <h2 id="page-title" class="text-3xl font-semibold logo-font tracking-tight">Marketing Dashboard</h2>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center bg-zinc-800 rounded-3xl px-4 py-2 text-sm">
+                        <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse mr-2"></div>
+                        Connected to LottoCanvas
+                    </div>
+
+                    <button onclick="generateAll()"
+                            class="flex items-center gap-2 bg-white text-zinc-900 px-6 py-3 rounded-3xl font-semibold hover:bg-purple-100 transition-colors">
+                        <i class="fas fa-bolt"></i>
+                        <span>Generate Viral Batch</span>
+                    </button>
+
+                    <div class="relative">
+                        <button class="w-9 h-9 bg-zinc-800 rounded-2xl flex items-center justify-center cursor-pointer hover:bg-zinc-700 transition-colors">
+                            <i class="fas fa-bell"></i>
+                        </button>
+                        <span class="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 rounded-full text-white badge flex items-center justify-center font-bold">3</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard (Index 0) -->
+            <div id="screen-0" class="p-8">
+                <div class="grid grid-cols-12 gap-6">
+                    <!-- Stats -->
+                    <div class="col-span-12 md:col-span-8 grid grid-cols-2 md:grid-cols-4 gap-6">
+                        <div class="bg-zinc-900 rounded-3xl p-6 card-hover border border-purple-500/20">
+                            <div class="text-purple-400 text-sm">Posts This Week</div>
+                            <div class="text-5xl font-bold mt-2">47</div>
+                            <div class="text-emerald-400 text-sm mt-4 flex items-center gap-1">
+                                <i class="fas fa-arrow-up"></i> +12 from last week
+                            </div>
+                        </div>
+                        <div class="bg-zinc-900 rounded-3xl p-6 card-hover">
+                            <div class="text-amber-400 text-sm">Avg. Engagement</div>
+                            <div class="text-5xl font-bold mt-2">8.4k</div>
+                            <div class="text-sm mt-4 text-zinc-400">Likes + Comments</div>
+                        </div>
+                        <div class="bg-zinc-900 rounded-3xl p-6 card-hover">
+                            <div class="text-rose-400 text-sm">Reach</div>
+                            <div class="text-5xl font-bold mt-2">124k</div>
+                            <div class="text-sm mt-4 text-zinc-400">Impressions</div>
+                        </div>
+                        <div class="bg-zinc-900 rounded-3xl p-6 card-hover">
+                            <div class="text-sky-400 text-sm">Conversions</div>
+                            <div class="text-5xl font-bold mt-2">219</div>
+                            <div class="text-xs text-emerald-400 mt-4">App downloads from posts</div>
+                        </div>
+                    </div>
+
+                    <div class="col-span-12 md:col-span-4 bg-zinc-900 rounded-3xl p-6">
+                        <h3 class="font-semibold mb-4">Latest Prediction</h3>
+                        <div class="bg-black/60 rounded-2xl p-5 text-center">
+                            <div class="text-xs text-zinc-400 mb-2">UK 49s • Today</div>
+                            <div class="flex justify-center gap-2 text-3xl font-mono font-bold flex-wrap">
+                                <span class="bg-purple-900/50 px-3 py-2 rounded-2xl">12</span>
+                                <span class="bg-purple-900/50 px-3 py-2 rounded-2xl">19</span>
+                                <span class="bg-purple-900/50 px-3 py-2 rounded-2xl">27</span>
+                                <span class="bg-purple-900/50 px-3 py-2 rounded-2xl">35</span>
+                                <span class="bg-purple-900/50 px-3 py-2 rounded-2xl">41</span>
+                                <span class="bg-rose-900/50 px-3 py-2 rounded-2xl">48</span>
+                            </div>
+                            <button onclick="useThisPrediction()"
+                                    class="mt-6 w-full py-3 bg-white text-black rounded-2xl font-semibold hover:bg-purple-100 transition-colors">Use in Campaign</button>
+                        </div>
+                    </div>
+
+                    <!-- Quick Generator -->
+                    <div class="col-span-12 lg:col-span-8 bg-zinc-900 rounded-3xl p-8">
+                        <h3 class="text-xl font-semibold mb-6 flex items-center gap-3">
+                            <i class="fas fa-wand-magic-sparkles text-purple-400"></i>
+                            Instant Content Generator
+                        </h3>
+
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <div onclick="quickGenerate('whatsapp')" class="bg-zinc-800 hover:bg-purple-900/30 border border-transparent hover:border-purple-500 rounded-3xl p-6 cursor-pointer card-hover transition-all">
+                                <div class="text-4xl mb-4">📱</div>
+                                <div class="font-medium">WhatsApp Status</div>
+                                <div class="text-xs text-zinc-400">High-res poster</div>
+                            </div>
+                            <div onclick="quickGenerate('instagram')" class="bg-zinc-800 hover:bg-purple-900/30 border border-transparent hover:border-purple-500 rounded-3xl p-6 cursor-pointer card-hover transition-all">
+                                <div class="text-4xl mb-4">📸</div>
+                                <div class="font-medium">Instagram Reel</div>
+                                <div class="text-xs text-zinc-400">15s video template</div>
+                            </div>
+                            <div onclick="quickGenerate('twitter')" class="bg-zinc-800 hover:bg-purple-900/30 border border-transparent hover:border-purple-500 rounded-3xl p-6 cursor-pointer card-hover transition-all">
+                                <div class="text-4xl mb-4">𝕏</div>
+                                <div class="font-medium">X Prediction Card</div>
+                                <div class="text-xs text-zinc-400">Engagement optimized</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-span-12 lg:col-span-4 bg-gradient-to-br from-purple-900 to-pink-900 rounded-3xl p-8 flex flex-col justify-between">
+                        <div>
+                            <div class="uppercase text-xs tracking-widest text-purple-300">AI Caption Ready</div>
+                            <div class="text-xl font-medium mt-3 leading-relaxed">"These numbers are hitting different today 🔥 My algorithm is screaming 27-41!"</div>
+                        </div>
+                        <button onclick="copyCaption()"
+                                class="mt-8 bg-white/10 hover:bg-white/20 transition-colors py-4 rounded-3xl text-center font-medium flex items-center justify-center gap-2">
+                            <i class="fas fa-copy"></i> Copy Caption
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Viral Generator (Index 1) -->
+            <div id="screen-1" class="p-8 hidden">
+                <h2 class="text-3xl font-bold mb-8">Viral Content Generator</h2>
+
+                <div class="max-w-2xl mx-auto bg-zinc-900 rounded-3xl p-10">
+                    <div class="mb-8">
+                        <label class="block text-sm text-zinc-400 mb-2">Select Prediction Source</label>
+                        <select id="pred-source" class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-6 py-4 text-lg text-zinc-200 focus:outline-none focus:border-purple-500 transition-colors">
+                            <option>Latest UK49s Intelligent Prediction</option>
+                            <option>Hot/Cold Blend (Combi-Matrix)</option>
+                            <option>Gap Analyser Overdue Numbers</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-6 mb-10">
+                        <div>
+                            <label class="block text-sm text-zinc-400 mb-3">Platform</label>
+                            <div class="flex flex-wrap gap-3">
+                                <button onclick="togglePlatform(this)" data-platform="whatsapp" class="platform-btn px-5 py-3 bg-purple-600 rounded-2xl font-medium text-sm transition-colors">📱 WhatsApp</button>
+                                <button onclick="togglePlatform(this)" data-platform="instagram" class="platform-btn px-5 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-2xl font-medium text-sm transition-colors">📸 Instagram</button>
+                                <button onclick="togglePlatform(this)" data-platform="tiktok" class="platform-btn px-5 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-2xl font-medium text-sm transition-colors">🎵 TikTok</button>
+                                <button onclick="togglePlatform(this)" data-platform="twitter" class="platform-btn px-5 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-2xl font-medium text-sm transition-colors">𝕏 X</button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm text-zinc-400 mb-3">Style</label>
+                            <select id="style" class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-6 py-4 text-zinc-200 focus:outline-none focus:border-purple-500 transition-colors">
+                                <option>Urgent + Hype</option>
+                                <option>Professional Analyst</option>
+                                <option>Fun &amp; Memey</option>
+                                <option>Mysterious Fortune Teller</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button onclick="generateContent()"
+                            class="w-full py-6 text-xl font-semibold lotto-gradient rounded-3xl hover:scale-[1.02] transition-transform flex items-center justify-center gap-3">
+                        <i class="fas fa-wand-magic-sparkles"></i>
+                        Generate Branded Content
+                    </button>
+
+                    <div id="generated-result" class="hidden mt-10 border border-purple-500/30 rounded-3xl p-8 bg-black/40">
+                        <div class="flex items-center justify-center gap-2 text-emerald-400 text-sm mb-6">
+                            <i class="fas fa-check-circle"></i> Generated Successfully
+                        </div>
+                        <div id="mock-visual" class="bg-gradient-to-br from-purple-900/60 to-pink-900/60 border border-purple-500/30 h-64 rounded-2xl flex flex-col items-center justify-center gap-3 mb-6">
+                            <div class="text-5xl">📱</div>
+                            <div class="text-lg font-medium text-zinc-300">Poster Preview</div>
+                            <div class="text-xs text-zinc-500">1080 × 1920 • WhatsApp optimised</div>
+                        </div>
+                        <div id="mock-caption" class="italic text-zinc-300 bg-zinc-800/60 rounded-2xl p-4 text-sm leading-relaxed"></div>
+                        <div class="flex gap-3 mt-6">
+                            <button onclick="downloadContent()" class="flex-1 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-2xl font-medium transition-colors flex items-center justify-center gap-2 text-sm">
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                            <button onclick="schedulePost()" class="flex-1 py-3 lotto-gradient rounded-2xl font-medium transition-colors flex items-center justify-center gap-2 text-sm">
+                                <i class="fas fa-clock"></i> Schedule Post
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Campaigns (Index 2) -->
+            <div id="screen-2" class="p-8 hidden">
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-3xl font-bold">Campaign Manager</h2>
+                    <button onclick="showToast('New campaign created', 'success')" class="flex items-center gap-2 bg-white text-zinc-900 px-6 py-3 rounded-3xl font-semibold hover:bg-purple-100 transition-colors text-sm">
+                        <i class="fas fa-plus"></i> New Campaign
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-12 gap-6">
+                    <!-- Active Campaigns -->
+                    <div class="col-span-12 lg:col-span-8 space-y-4">
+                        <div class="text-xs uppercase tracking-widest text-zinc-500 mb-2">Active Campaigns</div>
+
+                        <div class="bg-zinc-900 rounded-3xl p-6 flex items-center gap-5 card-hover border border-purple-500/10">
+                            <div class="w-12 h-12 bg-emerald-900/40 border border-emerald-500/30 rounded-2xl flex items-center justify-center text-xl">📱</div>
+                            <div class="flex-1">
+                                <div class="font-medium">UK49s Weekend Blast</div>
+                                <div class="text-xs text-zinc-400 mt-1">WhatsApp · Instagram · X &nbsp;•&nbsp; Runs Fri–Sun</div>
+                                <div class="mt-3 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                                    <div class="progress-bar h-full bg-emerald-500 rounded-full" style="width: 68%"></div>
+                                </div>
+                                <div class="text-xs text-zinc-500 mt-1">68% of budget used</div>
+                            </div>
+                            <span class="badge bg-emerald-900/40 text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-full font-semibold uppercase tracking-wider">Live</span>
+                        </div>
+
+                        <div class="bg-zinc-900 rounded-3xl p-6 flex items-center gap-5 card-hover border border-purple-500/10">
+                            <div class="w-12 h-12 bg-amber-900/40 border border-amber-500/30 rounded-2xl flex items-center justify-center text-xl">🎯</div>
+                            <div class="flex-1">
+                                <div class="font-medium">Lunchtime Picks — Prediction Series</div>
+                                <div class="text-xs text-zinc-400 mt-1">TikTok · Instagram &nbsp;•&nbsp; Daily 11:30 SAST</div>
+                                <div class="mt-3 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                                    <div class="progress-bar h-full bg-amber-500 rounded-full" style="width: 42%"></div>
+                                </div>
+                                <div class="text-xs text-zinc-500 mt-1">42% of budget used</div>
+                            </div>
+                            <span class="badge bg-amber-900/40 text-amber-400 border border-amber-500/30 px-3 py-1 rounded-full font-semibold uppercase tracking-wider">Scheduled</span>
+                        </div>
+
+                        <div class="bg-zinc-900 rounded-3xl p-6 flex items-center gap-5 card-hover border border-purple-500/10 opacity-60">
+                            <div class="w-12 h-12 bg-zinc-800 border border-zinc-700 rounded-2xl flex items-center justify-center text-xl">📊</div>
+                            <div class="flex-1">
+                                <div class="font-medium">Monthly Analyst Recap</div>
+                                <div class="text-xs text-zinc-400 mt-1">All platforms &nbsp;•&nbsp; Starts 1 Jun</div>
+                                <div class="mt-3 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                                    <div class="h-full bg-zinc-600 rounded-full" style="width: 0%"></div>
+                                </div>
+                                <div class="text-xs text-zinc-500 mt-1">Not started</div>
+                            </div>
+                            <span class="badge bg-zinc-800 text-zinc-400 border border-zinc-700 px-3 py-1 rounded-full font-semibold uppercase tracking-wider">Draft</span>
+                        </div>
+                    </div>
+
+                    <!-- Campaign Summary -->
+                    <div class="col-span-12 lg:col-span-4 space-y-4">
+                        <div class="text-xs uppercase tracking-widest text-zinc-500 mb-2">This Month</div>
+                        <div class="bg-zinc-900 rounded-3xl p-6">
+                            <div class="space-y-5">
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="text-zinc-400">Total Spend</span>
+                                        <span class="font-semibold">R 4,280</span>
+                                    </div>
+                                    <div class="h-1.5 bg-zinc-800 rounded-full">
+                                        <div class="progress-bar h-full lotto-gradient rounded-full" style="width: 55%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="text-zinc-400">Posts Published</span>
+                                        <span class="font-semibold">47</span>
+                                    </div>
+                                    <div class="h-1.5 bg-zinc-800 rounded-full">
+                                        <div class="progress-bar h-full bg-purple-500 rounded-full" style="width: 78%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="text-zinc-400">Audience Reached</span>
+                                        <span class="font-semibold">124k</span>
+                                    </div>
+                                    <div class="h-1.5 bg-zinc-800 rounded-full">
+                                        <div class="progress-bar h-full bg-sky-500 rounded-full" style="width: 90%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-gradient-to-br from-purple-900/60 to-pink-900/60 border border-purple-500/20 rounded-3xl p-6">
+                            <div class="text-sm text-purple-300 mb-1">Best Performing Post</div>
+                            <div class="font-semibold mt-1">Friday 49s Prediction</div>
+                            <div class="text-xs text-zinc-400 mt-1">12.4k engagements • 3.1k shares</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scheduler (Index 3) -->
+            <div id="screen-3" class="p-8 hidden">
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-3xl font-bold">Post Scheduler</h2>
+                    <button onclick="showToast('Post added to queue', 'success')" class="flex items-center gap-2 bg-white text-zinc-900 px-6 py-3 rounded-3xl font-semibold hover:bg-purple-100 transition-colors text-sm">
+                        <i class="fas fa-plus"></i> Schedule Post
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-12 gap-6">
+                    <!-- Connected Accounts -->
+                    <div class="col-span-12 lg:col-span-4 space-y-4">
+                        <div class="text-xs uppercase tracking-widest text-zinc-500 mb-2">Connected Accounts</div>
+                        <div class="space-y-3">
+                            <div class="bg-zinc-900 rounded-2xl p-4 flex items-center gap-4">
+                                <div class="text-2xl">📱</div>
+                                <div class="flex-1">
+                                    <div class="font-medium text-sm">WhatsApp Business</div>
+                                    <div class="text-xs text-emerald-400">Active • +27 82 000 0000</div>
+                                </div>
+                                <i class="fas fa-check-circle text-emerald-400"></i>
+                            </div>
+                            <div class="bg-zinc-900 rounded-2xl p-4 flex items-center gap-4">
+                                <div class="text-2xl">📸</div>
+                                <div class="flex-1">
+                                    <div class="font-medium text-sm">Instagram</div>
+                                    <div class="text-xs text-emerald-400">Active • @lottocanvas_za</div>
+                                </div>
+                                <i class="fas fa-check-circle text-emerald-400"></i>
+                            </div>
+                            <div class="bg-zinc-900 rounded-2xl p-4 flex items-center gap-4">
+                                <div class="text-2xl">𝕏</div>
+                                <div class="flex-1">
+                                    <div class="font-medium text-sm">X (Twitter)</div>
+                                    <div class="text-xs text-emerald-400">Active • @lottocanvas</div>
+                                </div>
+                                <i class="fas fa-check-circle text-emerald-400"></i>
+                            </div>
+                            <div class="bg-zinc-900 rounded-2xl p-4 flex items-center gap-4 opacity-50">
+                                <div class="text-2xl">🎵</div>
+                                <div class="flex-1">
+                                    <div class="font-medium text-sm">TikTok</div>
+                                    <div class="text-xs text-zinc-500">Not connected</div>
+                                </div>
+                                <button onclick="showToast('TikTok connection flow opened', 'info')" class="text-xs text-purple-400 hover:text-purple-300 transition-colors">Connect</button>
+                            </div>
+                            <div class="bg-zinc-900 rounded-2xl p-4 flex items-center gap-4 opacity-50">
+                                <div class="text-2xl">✈️</div>
+                                <div class="flex-1">
+                                    <div class="font-medium text-sm">Telegram</div>
+                                    <div class="text-xs text-zinc-500">Not connected</div>
+                                </div>
+                                <button onclick="showToast('Telegram connection flow opened', 'info')" class="text-xs text-purple-400 hover:text-purple-300 transition-colors">Connect</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Upcoming Queue -->
+                    <div class="col-span-12 lg:col-span-8">
+                        <div class="text-xs uppercase tracking-widest text-zinc-500 mb-4">Upcoming Queue</div>
+                        <div class="space-y-3">
+                            <div class="bg-zinc-900 rounded-3xl p-5 flex items-center gap-5">
+                                <div class="text-center min-w-[52px]">
+                                    <div class="text-xs text-zinc-500">Today</div>
+                                    <div class="text-lg font-bold">17:00</div>
+                                </div>
+                                <div class="w-px h-10 bg-zinc-800"></div>
+                                <div class="flex-1">
+                                    <div class="font-medium text-sm">Teatime Prediction Drop</div>
+                                    <div class="text-xs text-zinc-400 mt-1">📱 WhatsApp • 📸 Instagram</div>
+                                </div>
+                                <span class="text-xs bg-purple-900/40 text-purple-300 px-3 py-1 rounded-full">Ready</span>
+                            </div>
+                            <div class="bg-zinc-900 rounded-3xl p-5 flex items-center gap-5">
+                                <div class="text-center min-w-[52px]">
+                                    <div class="text-xs text-zinc-500">Tomorrow</div>
+                                    <div class="text-lg font-bold">09:30</div>
+                                </div>
+                                <div class="w-px h-10 bg-zinc-800"></div>
+                                <div class="flex-1">
+                                    <div class="font-medium text-sm">Morning Pick Alert</div>
+                                    <div class="text-xs text-zinc-400 mt-1">𝕏 X • 📱 WhatsApp</div>
+                                </div>
+                                <span class="text-xs bg-amber-900/40 text-amber-300 px-3 py-1 rounded-full">Pending</span>
+                            </div>
+                            <div class="bg-zinc-900 rounded-3xl p-5 flex items-center gap-5">
+                                <div class="text-center min-w-[52px]">
+                                    <div class="text-xs text-zinc-500">Fri 16 May</div>
+                                    <div class="text-lg font-bold">12:00</div>
+                                </div>
+                                <div class="w-px h-10 bg-zinc-800"></div>
+                                <div class="flex-1">
+                                    <div class="font-medium text-sm">Weekend Lunchtime Special</div>
+                                    <div class="text-xs text-zinc-400 mt-1">📱 WhatsApp • 📸 Instagram • 𝕏 X</div>
+                                </div>
+                                <span class="text-xs bg-zinc-800 text-zinc-400 px-3 py-1 rounded-full">Draft</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics (Index 4) -->
+            <div id="screen-4" class="p-8 hidden">
+                <h2 class="text-3xl font-bold mb-8">Performance Analytics</h2>
+
+                <div class="grid grid-cols-12 gap-6">
+                    <!-- Top KPIs -->
+                    <div class="col-span-6 md:col-span-3 bg-zinc-900 rounded-3xl p-6 card-hover">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-zinc-400 text-sm">Total Reach</span>
+                            <i class="fas fa-globe text-purple-400"></i>
+                        </div>
+                        <div class="text-4xl font-bold">124,892</div>
+                        <div class="text-xs text-emerald-400 mt-2 flex items-center gap-1"><i class="fas fa-arrow-up"></i> +18.4% vs last month</div>
+                    </div>
+                    <div class="col-span-6 md:col-span-3 bg-zinc-900 rounded-3xl p-6 card-hover">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-zinc-400 text-sm">Engagements</span>
+                            <i class="fas fa-heart text-rose-400"></i>
+                        </div>
+                        <div class="text-4xl font-bold">47.3k</div>
+                        <div class="text-xs text-emerald-400 mt-2 flex items-center gap-1"><i class="fas fa-arrow-up"></i> +9.1% vs last month</div>
+                    </div>
+                    <div class="col-span-6 md:col-span-3 bg-zinc-900 rounded-3xl p-6 card-hover">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-zinc-400 text-sm">App Installs</span>
+                            <i class="fas fa-mobile-alt text-sky-400"></i>
+                        </div>
+                        <div class="text-4xl font-bold">219</div>
+                        <div class="text-xs text-emerald-400 mt-2 flex items-center gap-1"><i class="fas fa-arrow-up"></i> +5.7% vs last month</div>
+                    </div>
+                    <div class="col-span-6 md:col-span-3 bg-zinc-900 rounded-3xl p-6 card-hover">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-zinc-400 text-sm">Avg. CTR</span>
+                            <i class="fas fa-mouse-pointer text-amber-400"></i>
+                        </div>
+                        <div class="text-4xl font-bold">3.8%</div>
+                        <div class="text-xs text-emerald-400 mt-2 flex items-center gap-1"><i class="fas fa-arrow-up"></i> +0.4pp vs last month</div>
+                    </div>
+
+                    <!-- Top Posts -->
+                    <div class="col-span-12 lg:col-span-8 bg-zinc-900 rounded-3xl p-8">
+                        <h3 class="font-semibold mb-6">Top Performing Posts</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-5">
+                                <div class="text-zinc-500 text-sm font-mono w-5">#1</div>
+                                <div class="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center text-sm">📱</div>
+                                <div class="flex-1">
+                                    <div class="text-sm font-medium">Friday 49s Prediction</div>
+                                    <div class="text-xs text-zinc-400">WhatsApp • 9 May</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-semibold text-sm">12.4k</div>
+                                    <div class="text-xs text-zinc-400">engagements</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-5">
+                                <div class="text-zinc-500 text-sm font-mono w-5">#2</div>
+                                <div class="w-10 h-10 bg-gradient-to-br from-rose-600 to-orange-600 rounded-xl flex items-center justify-center text-sm">📸</div>
+                                <div class="flex-1">
+                                    <div class="text-sm font-medium">Hot Numbers Reel</div>
+                                    <div class="text-xs text-zinc-400">Instagram • 7 May</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-semibold text-sm">9.8k</div>
+                                    <div class="text-xs text-zinc-400">engagements</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-5">
+                                <div class="text-zinc-500 text-sm font-mono w-5">#3</div>
+                                <div class="w-10 h-10 bg-gradient-to-br from-sky-600 to-blue-600 rounded-xl flex items-center justify-center text-sm">𝕏</div>
+                                <div class="flex-1">
+                                    <div class="text-sm font-medium">Algorithm Breakdown Thread</div>
+                                    <div class="text-xs text-zinc-400">X • 5 May</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-semibold text-sm">7.2k</div>
+                                    <div class="text-xs text-zinc-400">engagements</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Platform Breakdown -->
+                    <div class="col-span-12 lg:col-span-4 bg-zinc-900 rounded-3xl p-8">
+                        <h3 class="font-semibold mb-6">Platform Split</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span>📱 WhatsApp</span>
+                                    <span class="font-semibold">52%</span>
+                                </div>
+                                <div class="h-2 bg-zinc-800 rounded-full">
+                                    <div class="progress-bar h-full bg-emerald-500 rounded-full" style="width:52%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span>📸 Instagram</span>
+                                    <span class="font-semibold">28%</span>
+                                </div>
+                                <div class="h-2 bg-zinc-800 rounded-full">
+                                    <div class="progress-bar h-full bg-rose-500 rounded-full" style="width:28%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span>𝕏 X</span>
+                                    <span class="font-semibold">13%</span>
+                                </div>
+                                <div class="h-2 bg-zinc-800 rounded-full">
+                                    <div class="progress-bar h-full bg-sky-500 rounded-full" style="width:13%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span>🎵 TikTok</span>
+                                    <span class="font-semibold">7%</span>
+                                </div>
+                                <div class="h-2 bg-zinc-800 rounded-full">
+                                    <div class="progress-bar h-full bg-pink-500 rounded-full" style="width:7%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Referrals (Index 5) -->
+            <div id="screen-5" class="p-8 hidden">
+                <h2 class="text-3xl font-bold mb-8">Referral Program</h2>
+
+                <div class="grid grid-cols-12 gap-6">
+                    <!-- Referral Link Card -->
+                    <div class="col-span-12 lg:col-span-7">
+                        <div class="bg-gradient-to-br from-purple-900/80 to-pink-900/80 border border-purple-500/20 rounded-3xl p-10">
+                            <div class="text-4xl mb-4">🎁</div>
+                            <h3 class="text-2xl font-semibold mb-2">Invite Friends, Earn Credits</h3>
+                            <p class="text-zinc-300 text-sm mb-8">Share your link and earn <strong>50 free content credits</strong> for every friend who signs up and publishes their first post.</p>
+
+                            <div class="bg-black/30 border border-white/10 rounded-2xl p-4 flex items-center gap-3 mb-4">
+                                <span class="flex-1 font-mono text-sm text-purple-200 truncate">https://lotto.canvas/ref/goodnessza</span>
+                                <button onclick="copyReferralLink()" class="text-xs bg-white/10 hover:bg-white/20 transition-colors px-4 py-2 rounded-xl font-medium flex-shrink-0 flex items-center gap-2">
+                                    <i class="fas fa-copy"></i> Copy
+                                </button>
+                            </div>
+
+                            <div class="flex gap-3">
+                                <button onclick="showToast('Referral link shared to WhatsApp', 'success')" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 transition-colors px-5 py-3 rounded-2xl text-sm font-medium">
+                                    📱 Share on WhatsApp
+                                </button>
+                                <button onclick="showToast('Referral link copied to clipboard', 'success')" class="flex items-center gap-2 bg-white/10 hover:bg-white/20 transition-colors px-5 py-3 rounded-2xl text-sm font-medium">
+                                    𝕏 Share on X
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Referral Stats -->
+                    <div class="col-span-12 lg:col-span-5 space-y-4">
+                        <div class="bg-zinc-900 rounded-3xl p-6">
+                            <div class="text-zinc-400 text-sm mb-1">Total Referrals</div>
+                            <div class="text-5xl font-bold">14</div>
+                            <div class="text-xs text-emerald-400 mt-2">+3 this month</div>
+                        </div>
+                        <div class="bg-zinc-900 rounded-3xl p-6">
+                            <div class="text-zinc-400 text-sm mb-1">Credits Earned</div>
+                            <div class="text-5xl font-bold text-purple-400">700</div>
+                            <div class="text-xs text-zinc-400 mt-2">≈ 35 content generations</div>
+                        </div>
+                        <div class="bg-zinc-900 rounded-3xl p-6">
+                            <div class="text-zinc-400 text-sm mb-3">Recent Referrals</div>
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-3 text-sm">
+                                    <div class="w-7 h-7 bg-purple-600 rounded-full flex items-center justify-center text-xs">S</div>
+                                    <span class="flex-1">Sipho M.</span>
+                                    <span class="text-xs text-zinc-500">2 days ago</span>
+                                    <span class="text-emerald-400 text-xs">+50 cr</span>
+                                </div>
+                                <div class="flex items-center gap-3 text-sm">
+                                    <div class="w-7 h-7 bg-pink-600 rounded-full flex items-center justify-center text-xs">N</div>
+                                    <span class="flex-1">Nomsa K.</span>
+                                    <span class="text-xs text-zinc-500">5 days ago</span>
+                                    <span class="text-emerald-400 text-xs">+50 cr</span>
+                                </div>
+                                <div class="flex items-center gap-3 text-sm">
+                                    <div class="w-7 h-7 bg-sky-600 rounded-full flex items-center justify-center text-xs">T</div>
+                                    <span class="flex-1">Thabo L.</span>
+                                    <span class="text-xs text-zinc-500">1 week ago</span>
+                                    <span class="text-emerald-400 text-xs">+50 cr</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function navigate(index) {
+            document.querySelectorAll('[id^="screen-"]').forEach(s => s.classList.add('hidden'));
+            document.getElementById(`screen-${index}`).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-item').forEach((el, i) => {
+                el.classList.toggle('bg-purple-950', i === index);
+                el.classList.toggle('text-white', i === index);
+            });
+
+            const titles = ["Marketing Dashboard", "Viral Content Generator", "Campaign Manager", "Scheduler", "Analytics", "Referrals"];
+            document.getElementById('page-title').textContent = titles[index];
+        }
+
+        function showToast(message, type = 'success') {
+            const icons = { success: 'fa-check-circle', info: 'fa-info-circle', warning: 'fa-exclamation-circle' };
+            const colors = { success: 'text-emerald-400', info: 'text-sky-400', warning: 'text-amber-400' };
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast pointer-events-auto flex items-center gap-3 bg-zinc-900 border border-zinc-800 shadow-xl rounded-2xl px-5 py-4 text-sm`;
+            toast.innerHTML = `<i class="fas ${icons[type] || icons.info} ${colors[type] || colors.info}"></i><span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3200);
+        }
+
+        function quickGenerate(type) {
+            showToast(`Generating ${type.charAt(0).toUpperCase() + type.slice(1)} content from latest predictions…`, 'info');
+            setTimeout(() => navigate(1), 600);
+        }
+
+        function generateContent() {
+            const result = document.getElementById('generated-result');
+            result.classList.remove('hidden');
+
+            const captions = [
+                "These 6 numbers have been cooking in my LottoCanvas algorithm for 3 days straight 🔥 Who's playing them tonight?",
+                "Hot numbers just dropped. My system says this combination has an 87% pattern match. Good luck family!",
+                "The wait is over — my predictions are LIVE. Save this post 👀"
+            ];
+
+            document.getElementById('mock-caption').textContent = captions[Math.floor(Math.random() * captions.length)];
+            showToast('Content generated successfully', 'success');
+        }
+
+        function togglePlatform(btn) {
+            const isActive = btn.classList.contains('bg-purple-600');
+            btn.classList.toggle('bg-purple-600', !isActive);
+            btn.classList.toggle('bg-zinc-800', isActive);
+        }
+
+        function useThisPrediction() {
+            showToast('Prediction loaded into Viral Generator', 'success');
+            setTimeout(() => navigate(1), 500);
+        }
+
+        function copyCaption() {
+            navigator.clipboard.writeText("These numbers are hitting different today 🔥 My algorithm is screaming 27-41!").then(() => {
+                showToast('Caption copied to clipboard', 'success');
+            });
+        }
+
+        function copyReferralLink() {
+            navigator.clipboard.writeText('https://lotto.canvas/ref/goodnessza').then(() => {
+                showToast('Referral link copied to clipboard', 'success');
+            });
+        }
+
+        function generateAll() {
+            showToast('Generating 12 pieces of content across all platforms…', 'info');
+            setTimeout(() => navigate(1), 1200);
+        }
+
+        function downloadContent() {
+            showToast('Your content is being prepared for download', 'info');
+        }
+
+        function schedulePost() {
+            showToast('Post added to your schedule queue', 'success');
+            setTimeout(() => navigate(3), 700);
+        }
+
+        function openLogoutModal() {
+            document.getElementById('logout-modal').classList.remove('hidden');
+        }
+
+        function closeLogoutModal() {
+            document.getElementById('logout-modal').classList.add('hidden');
+        }
+
+        function confirmLogout() {
+            closeLogoutModal();
+            showToast('Signing out…', 'info');
+            setTimeout(() => window.location.reload(), 1500);
+        }
+
+        window.onload = () => {
+            document.querySelector('.nav-item').classList.add('bg-purple-950', 'text-white');
+        };
+    </script>
+</body>
+</html>
