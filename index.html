@@ -264,20 +264,49 @@
                         </div>
                     </div>
 
+                    <div class="mb-8 bg-zinc-800/70 border border-zinc-700 rounded-3xl p-6">
+                        <div class="flex items-center justify-between gap-4 mb-4">
+                            <h4 class="font-semibold text-lg flex items-center gap-2">
+                                <i class="fas fa-robot text-purple-400"></i>
+                                Content Automation Engine
+                            </h4>
+                            <span class="text-xs uppercase tracking-widest text-emerald-400">Auto Mode</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                            <div class="bg-zinc-900 rounded-2xl px-4 py-3 border border-zinc-700">
+                                <div class="font-medium">Prediction Posters</div>
+                                <div class="text-xs text-zinc-400 mt-1">Auto-created visual headlines</div>
+                            </div>
+                            <div class="bg-zinc-900 rounded-2xl px-4 py-3 border border-zinc-700">
+                                <div class="font-medium">AI Captions</div>
+                                <div class="text-xs text-zinc-400 mt-1">Platform-ready high-engagement text</div>
+                            </div>
+                            <div class="bg-zinc-900 rounded-2xl px-4 py-3 border border-zinc-700">
+                                <div class="font-medium">Viral Hooks</div>
+                                <div class="text-xs text-zinc-400 mt-1">Attention-grabbing openers</div>
+                            </div>
+                        </div>
+                    </div>
+
                     <button onclick="generateContent()"
                             class="w-full py-6 text-xl font-semibold lotto-gradient rounded-3xl hover:scale-[1.02] transition-transform flex items-center justify-center gap-3">
                         <i class="fas fa-wand-magic-sparkles"></i>
-                        Generate Branded Content
+                        Run Content Automation Engine
                     </button>
 
                     <div id="generated-result" class="hidden mt-10 border border-blue-200 rounded-3xl p-8 bg-blue-50/40">
                         <div class="flex items-center justify-center gap-2 text-emerald-400 text-sm mb-6">
                             <i class="fas fa-check-circle"></i> Generated Successfully
                         </div>
-                        <div id="mock-visual" class="bg-gradient-to-br from-blue-100 to-sky-100 border border-blue-200 h-64 rounded-2xl flex flex-col items-center justify-center gap-3 mb-6">
+                        <div id="mock-visual" class="bg-gradient-to-br from-blue-100 to-sky-100 border border-blue-200 h-64 rounded-2xl flex flex-col items-center justify-center gap-3 mb-6 px-6 text-center">
                             <div class="text-5xl">📱</div>
-                            <div class="text-lg font-medium text-slate-700">Poster Preview</div>
+                            <div id="poster-headline" class="text-lg font-semibold text-slate-700"></div>
+                            <div id="poster-subline" class="text-xs text-slate-500 max-w-md"></div>
                             <div class="text-xs text-slate-400">1080 × 1920 • WhatsApp optimised</div>
+                        </div>
+                        <div class="mb-4">
+                            <div class="text-xs uppercase tracking-widest text-slate-400 mb-2">Viral Hooks</div>
+                            <div id="mock-hooks" class="space-y-2 text-sm"></div>
                         </div>
                         <div id="mock-caption" class="italic text-slate-700 bg-slate-100/60 rounded-2xl p-4 text-sm leading-relaxed"></div>
                         <div class="flex gap-3 mt-6">
@@ -738,14 +767,50 @@
             const result = document.getElementById('generated-result');
             result.classList.remove('hidden');
 
+            const posterLines = [
+                {
+                    headline: "Tonight’s numbers are trending hot 🔥",
+                    subline: "Momentum score is rising across key picks heading into the next draw."
+                },
+                {
+                    headline: "Pattern intelligence detected unusual frequency movement",
+                    subline: "Our model spotted accelerated recurrence in priority number clusters."
+                },
+                {
+                    headline: "Top confidence prediction for tonight",
+                    subline: "Highest-confidence sequence generated from latest pattern data."
+                }
+            ];
+
             const captions = [
+                "Tonight’s numbers are trending hot 🔥 Lock in early and watch the pattern unfold.",
+                "Pattern intelligence detected unusual frequency movement — this draw could shift hard.",
+                "Top confidence prediction for tonight is now live. Save this before the numbers close.",
                 "These 6 numbers have been cooking in my LottoCanvas algorithm for 3 days straight 🔥 Who's playing them tonight?",
                 "Hot numbers just dropped. My system says this combination has an 87% pattern match. Good luck family!",
                 "The wait is over — my predictions are LIVE. Save this post 👀"
             ];
 
-            document.getElementById('mock-caption').textContent = captions[Math.floor(Math.random() * captions.length)];
-            showToast('Content generated successfully', 'success');
+            const hooks = [
+                "3 numbers everyone is ignoring…",
+                "AI spotted this pattern before the last draw",
+                "The carry-forward trend is getting stronger",
+                "If this frequency holds, tonight could surprise everyone",
+                "Most players missed this sequence shift"
+            ];
+
+            const poster = posterLines[Math.floor(Math.random() * posterLines.length)];
+            const caption = captions[Math.floor(Math.random() * captions.length)];
+            const selectedHooks = hooks.sort(() => 0.5 - Math.random()).slice(0, 3);
+
+            document.getElementById('poster-headline').textContent = poster.headline;
+            document.getElementById('poster-subline').textContent = poster.subline;
+            document.getElementById('mock-caption').textContent = caption;
+            document.getElementById('mock-hooks').innerHTML = selectedHooks
+                .map(hook => `<div class="bg-zinc-800/60 border border-zinc-700 rounded-xl px-3 py-2 text-zinc-300">• ${hook}</div>`)
+                .join('');
+
+            showToast('Content Automation Engine generated poster, caption, and hooks', 'success');
         }
 
         function togglePlatform(btn) {
@@ -772,7 +837,7 @@
         }
 
         function generateAll() {
-            showToast('Generating 12 pieces of content across all platforms…', 'info');
+            showToast('Generating prediction posters, AI captions, and viral hooks…', 'info');
             setTimeout(() => openLottoCanvas('/campaigns/new', 'Batch flow opened in LottoCanvas'), 400);
             setTimeout(() => navigate(1), 1200);
         }
